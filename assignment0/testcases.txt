@@ -1,0 +1,105 @@
+./pointersorter “thing1stuff3otherstuff,blarp”
+./pointersorter "the*string*of*some*sort"
+of
+some
+sort
+string
+the
+./pointersorter "the*string*of*some*sort******"
+of
+some
+sort
+string
+the
+./pointersorter "***the*string*of*some*****sort"
+of
+some
+sort
+string
+the
+./pointersorter "the******string*of*some*sort"
+of
+some
+sort
+string
+the
+./pointersorter "the*string*of*Some*sOrt"
+of
+Some
+sOrt
+string
+the
+./pointersorter "The*&thatch*:thatcher**hatchet*hacker"
+hacker
+hatchet
+thatch
+thatcher
+The
+./pointersorter "The(&thatch\thatcher/hatchet'hacker"
+hacker
+hatchet
+thatch
+thatcher
+The
+./pointersorter '(The$&thatch\thatcher/hatchet$hacker'
+hacker
+hatchet
+thatch
+thatcher
+The
+./pointersorter '%%Undergraduate&^#$student*()AsSoCiation[]{}\|of~`Computer,.<>/?Scientists":;'
+
+AsSoCiation
+Computer
+of
+Scientists
+student
+Undergraduate
+
+./pointersorter '%=+-_%Undergraduate&^#$student*()AsSoCiation[]{}\|of~`Computer,.<>/?Scientists":;'
+
+AsSoCiation
+Computer
+of
+Scientists
+student
+Undergraduate
+
+"poop~lol"
+lol
+poop
+
+"poop`lol"
+>
+
+./pointersorter "poop@lol"
+lol
+poop
+
+./pointersorter "poop#lol"
+lol
+poop
+
+./pointersorter "poop$lol"
+poop
+
+./pointersorter "poop^lol"
+lol
+poop
+
+./pointersorter "poop%lol"
+lol
+poop
+
+./pointersorter "poop lol"
+lol
+poop
+
+./pointersorter "poop|lol"
+lol
+poop
+
+./pointersorter
+Please use only 1 argument.
+i.e. ./pointersorter "the*string*of*some*sort"
+Exiting...
