@@ -9,25 +9,33 @@ void malloc(size_t size) {
 		return null;
 	}
 	
-	if(size > 5000 - /*size of metadata*/){
+	if(size > 5000 - sizeof(int) ){
 		return null;
 	}
 
 	int i = 0;
 
+	//Check the num value from each allocation value
+
 	while(arr[i] > 0 || (arr[i] < 0 && arr[i] < -size) || i > 4999){
+		
+		if(i < 0){
+			
+			i = -arr[i] + i;
+			continue;
+		}
+
 		i = arr[i] + i;
 	}
 
-	if( (i + /*size of metadata*/ + size) > 4999){
+	if( (i + sizeof(int) + size) > 4999){
 		return null;
 	}
 
-	//Loop through each array index and put each bit into thier indices. 
 	int *num = (int*) (&arr[i]);
 	num = size;
 
-	return int *num + 4;
+	return num++;
 	
 }
 
@@ -36,11 +44,15 @@ void free(void *ptr){
 	int *ptrInt = (int*) (&ptr);
 	ptrInt--;
 
-	
+	if( *ptrInt <= 0){
+		return;
+	}
 
+	if( &arr[0] > ptrInt < &arr[4999]){
+		return;
+	}
+	
+	ptrInt = -1 * *ptrInt;
 	return;
-	//if unallocated, error
-	//if not address, error
-	//
 
 }
