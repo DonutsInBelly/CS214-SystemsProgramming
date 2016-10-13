@@ -5,9 +5,8 @@
 #define TEST_H
 
 typedef struct obj{
-  char letter;
-  int num1;
-  double num2;
+  int a;
+  char b;
 }obj;
 
 #endif
