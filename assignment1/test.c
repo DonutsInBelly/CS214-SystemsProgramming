@@ -17,4 +17,20 @@ int main(int argc, char** argv) {
   test2->c = 'p';
   printf("Address of test2: 0x%02X\n", test2);
   printf("a= %d\nb= %lf\nc= %c\n", test2->a, test2->b, test2->c);
+  free(test2);
+  free(test2+100);
+
+  printf("%s\n", "int pointer");
+  int *x;
+  free(x);
+
+  printf("%s\n", "primitive data type");
+  int l;
+  free(l);
+
+  struct obj1* test3 = malloc(sizeof(struct obj1));
+  test3->a = 1063;
+  test3->b = 'f';
+  printf("Address of test3: 0x%02X\n", test3);
+  printf("Number: %d\nCharacter: %c\n", test3->a, test3->b);
 }

@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-lm
+CFLAGS=-lm -Wall
 
 mymalloc:
 	$(CC) -o asst1 mymalloc.c test.c $(CFLAGS)
