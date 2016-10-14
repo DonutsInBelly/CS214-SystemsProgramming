@@ -26,7 +26,7 @@ void *mymalloc(size_t size) {
 		return NULL;
 	}
 
-	size_t i = 0;
+	int i = 0;
 	// search for open space in block
 	while (i < MAX_SIZE) {
 		printf("Current Slot Index: %d value in myBlock: %d\n", i, myBlock[i]);
@@ -40,13 +40,13 @@ void *mymalloc(size_t size) {
 		// -1 denotes first allocation
 		if (myBlock[i]==-1) {
 			// puts index of next Metadata location in this index
-			myBlock[i] = (i + 4 + size);
+			printf("Current Slot Index: %d value in myBlock: %d\n", i, myBlock[i]);
+			int *nextIndex = (int*)(&myBlock[i]);
+			*nextIndex = (i + 4 + size);
 			printf("Predicted next index: %d\n", i + 4 + size);
 			printf("Metadata index: %d, next slot index: %d\n", i, myBlock[i]);
 			lastAssigned = i;
 			printf("Metadata Location: 0x%02X\nAllocating %d bits at address: 0x%02X, with index: %d\nNext slot is: 0x%02X with index %d\n", &myBlock[i], size, &myBlock[i+4], i+4, &myBlock[i+4+size], myBlock[i]);
-			int next=i+4+size;
-			myBlock[i]=next;
 			return &myBlock[i+4];
 		}
 
