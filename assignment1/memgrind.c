@@ -2,7 +2,6 @@
 #include<stdlib.h>
 #include<math.h>
 #include<time.h>
-#include "mymalloc.h"
 
 char *byte[3000];
 
@@ -17,7 +16,7 @@ int main(){
 		free(byte[0]);
 		*/
 
-		time_t currRun;
+		time_t *currRun;
 		time(currRun);
 
 		// Test Case A: malloc() 1 byte 3000 times, then free() the 3000 1 byte pointers one by one
@@ -68,7 +67,7 @@ int main(){
 
 			else{
 
-				malloc(byte[0]);
+				byte[0] = malloc(1);
 				count++;
 			}
 
@@ -84,7 +83,7 @@ int main(){
 		freeCount = 0;
 		int mallocAmt = 0;
 		int x = 0;
-		char byte2;
+		char *byte2;
 
 		while(count <= 3000){
 
@@ -132,9 +131,9 @@ int main(){
 
 		free(byte2);
 
-		currRun = time(currRun);
+		*currRun = time(currRun);
 
-		sum = sum + currRun;
+		sum = sum + *currRun;
 	}
 
 	//Computing the average run time
