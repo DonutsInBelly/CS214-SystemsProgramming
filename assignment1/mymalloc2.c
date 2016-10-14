@@ -1,0 +1,89 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+#define MAX_SIZE 5000
+static  myBlock[MAX_SIZE];
+#define malloc( x ) mymalloc( x, __FILE__, __LINE__ )
+#define free( x ) myfree( x, __FILE__, __LINE__ )
+
+void *mymalloc(size_t size) {
+
+	printf("Start of method\n");
+	static unsigned int callCounter = 0;
+	int * metaData = (int*)(&myBlock[0]);
+
+	if(callCounter == 0) {
+		size_t i;
+		printf("Entered callCounter = 0 if statement.\n");
+		for (i = 0; i <= 1250; i = i + 4){
+			
+			metaData = (int*)(&myBlock[i]);
+			*metaData = 0;
+
+		}
+		printf("Finished the callCounter loop.\n");
+	}
+	callCounter++;
+
+	// Check if input is too large or 0
+	if( (size > MAX_SIZE - sizeof(int)) || size == 0){
+		printf("Too big or 0 size\n");
+		return NULL;
+	}
+
+	metaData = (int*)(&myBlock[0]);
+	size_t i = 0;
+	
+	while(i < MAX_SIZE){
+
+		metaData = (int*)(&myBlock[i]);
+
+		if( *metaData < 0 && *metaData <= -(size + 4)){
+			printf("Metadata is negative\n");
+			*metaData = size;
+			return &myBlock[i+4];
+		}
+
+		if( *metaData == 0 && 4999 - i >= size + 4){
+			printf("Metadata = 0\n");
+			*metaData = size;
+			return &myBlock[i+4];
+		}
+
+		if(*metaData > 0){
+			printf("Metadata > 0: %d\n", *metaData);
+			i = i + *metaData;
+		} 
+	}
+
+	return NULL;
+}
+
+void myfree(void *ptr){
+
+	int *ptrInt = (int*)(&ptr);
+	ptrInt--;
+
+	char *ptrCurr = &myBlock[0];
+
+	if( *ptrInt <= 0){
+		return;
+	}
+
+	int i;
+	int size;
+	for(i = 0; i < MAX_SIZE; i = i + size){
+		
+		
+		
+		if(&ptr == &myBlock[i]){
+			*ptrInt = *ptrInt * -1;
+			return;
+		}
+
+	}
+
+	*ptrInt *= -1;
+	return;
+}
