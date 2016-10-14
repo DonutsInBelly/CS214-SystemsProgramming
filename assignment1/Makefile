@@ -1,8 +1,8 @@
 CC=gcc
-CFLAGS=-lm -Wall
+CFLAGS=-lm -Wall -g
 
 mymalloc:
-	$(CC) -o asst1 mymalloc.c test.c $(CFLAGS)
+	$(CC) -o asst1 mymalloc.c memgrind.c $(CFLAGS)
 
 clean:
 	rm -rf asst1
