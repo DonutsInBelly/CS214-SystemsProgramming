@@ -11,7 +11,11 @@ int main(){
 	int ex;
 
 	for(ex = 0; ex < 100; ex++){
-		
+
+		/*
+		free(byte[0]);			
+		*/
+
 		time_t currRun;
 		time(currRun);
 	

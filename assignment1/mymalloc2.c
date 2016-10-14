@@ -61,29 +61,28 @@ void *mymalloc(size_t size) {
 }
 
 void myfree(void *ptr){
+	
+	int *ptrInt;
 
-	int *ptrInt = (int*)(&ptr);
-	ptrInt--;
-
-	char *ptrCurr = &myBlock[0];
-
-	if( *ptrInt <= 0){
+	if( *ptrInt == 0){
 		return;
 	}
 
+	//Store the first piece of data. +4 to skip metadata.
 	int i;
 	int size;
-	for(i = 0; i < MAX_SIZE; i = i + size){
-		
-		
-		
-		if(&ptr == &myBlock[i]){
+	
+	for(i = 4; i < MAX_SIZE; i = i + size){
+	
+		if(ptr == myBlock[i]){
 			*ptrInt = *ptrInt * -1;
 			return;
 		}
 
+		ptrInt = (int*)(&myBlock[i-4]);
+		size = *ptrInt;
+
 	}
 
-	*ptrInt *= -1;
 	return;
 }
