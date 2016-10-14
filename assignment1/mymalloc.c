@@ -4,11 +4,12 @@
 
 #define MAX_SIZE 5000
 
-void *mymalloc(size_t size) {
+static char myBlock[MAX_SIZE];
 
-	static char myBlock[MAX_SIZE];
+void *mymalloc(size_t size) {
 	static unsigned int callCounter = 0;
 	static unsigned int lastAssigned = 0;
+
 	// if malloc if being run for the first time, flood block with -1
 	if(callCounter==0) {
 		for (size_t i = 0; i < MAX_SIZE; i++) {

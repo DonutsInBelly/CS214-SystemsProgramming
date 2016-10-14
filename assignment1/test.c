@@ -4,14 +4,14 @@
 #include "mymalloc.h"
 
 int main(int argc, char** argv) {
-  struct obj1* test1 = mymalloc(sizeof(struct obj1));
+  struct obj1* test1 = malloc(sizeof(struct obj1));
   test1->a = 90;
   test1->b = 't';
   printf("Address of test1: 0x%02X\n", test1);
   printf("Number: %d\nCharacter: %c\n", test1->a, test1->b);
   //printf("Field a is at: 0x%02X\nField b is at: 0x%02X\n", );
 
-  struct obj2* test2 = mymalloc(sizeof(struct obj2));
+  struct obj2* test2 = malloc(sizeof(struct obj2));
   test2->a = 8;
   test2->b = 9.068;
   test2->c = 'p';
