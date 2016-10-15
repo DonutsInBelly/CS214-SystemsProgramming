@@ -31,7 +31,7 @@ void *mymalloc(size_t size) {
 	while (i < MAX_SIZE) {
 		printf("Current Slot Index: %d value in myBlock: %d\n", i, myBlock[i]);
 		// if index is non-negative and has a value, this slot is allocated
-		if(myBlock[i]>0) {
+		if(myBlock[i]>=0) {
 			i = myBlock[i];
 			printf("Moving to next slot at address: 0x%02X at index: %d\n", &myBlock[i], myBlock[i]);
 			continue;
