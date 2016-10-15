@@ -3,7 +3,7 @@
 #include <math.h>
 
 #define MAX_SIZE 5000
-static  myBlock[MAX_SIZE];
+static char myBlock[MAX_SIZE];
 #define malloc( x ) mymalloc( x, __FILE__, __LINE__ )
 #define free( x ) myfree( x, __FILE__, __LINE__ )
 
@@ -63,18 +63,14 @@ void *mymalloc(size_t size) {
 void myfree(void *ptr){
 	
 	int *ptrInt;
-
-	if( *ptrInt == 0){
-		return;
-	}
-
+	
 	//Store the first piece of data. +4 to skip metadata.
 	int i;
 	int size;
 	
 	for(i = 4; i < MAX_SIZE; i = i + size){
 	
-		if(ptr == myBlock[i]){
+		if(ptr == &myBlock[i]){
 			*ptrInt = *ptrInt * -1;
 			return;
 		}
