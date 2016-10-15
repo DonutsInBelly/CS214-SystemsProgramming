@@ -76,6 +76,11 @@ void myfree(void *ptr){
 		}
 
 		ptrInt = (int*)(&myBlock[i-4]);
+
+		if(*ptrInt == 0){
+			return;
+		}
+
 		size = *ptrInt;
 
 	}
