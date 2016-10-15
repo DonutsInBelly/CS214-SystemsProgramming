@@ -39,15 +39,19 @@ void *mymalloc(size_t size) {
 
 		metaData = (int*)(&myBlock[i]);
 
-		if( *metaData < 0 && *metaData <= -(size + 4)){
+		if( *metaData < 0 && *metaData <= -(size +8)){
 			printf("Metadata is negative\n");
 			*metaData = size;
+			int *ptr = (&myBlock[i +size])
+			*ptr = 0;	
 			return &myBlock[i+4];
 		}
 
-		if( *metaData == 0 && 4999 - i >= size + 4){
+		if( *metaData == 0 && 4999 - i >= size + 8){
 			printf("Metadata = 0\n");
 			*metaData = size;
+			int *ptr = (&myBlock[i +size])
+			*ptr = 0;
 			return &myBlock[i+4];
 		}
 
