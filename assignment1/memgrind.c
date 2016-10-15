@@ -16,7 +16,7 @@ int main(){
 		free(byte[0]);
 		*/
 
-		time_t *currRun;
+		time_t *currRun = (time_t*) malloc(sizeof(time_t));
 		time(currRun);
 
 		// Test Case A: malloc() 1 byte 3000 times, then free() the 3000 1 byte pointers one by one
@@ -40,7 +40,10 @@ int main(){
 
 		while(i < 3000){
 			free(byte[0]);
+			i++;
 		}
+
+		i = 0;
 
 		printf("--------------------------------\n");
 
@@ -138,8 +141,10 @@ int main(){
 
 	//Computing the average run time
 
-	sum = sum/100;
+	double avg = (double) sum/100;
 
-	printf("%d\n",sum);
+	printf("%f\n",avg);
 
+
+	return 0;
 }
