@@ -11,6 +11,8 @@ int main(int argc, char** argv) {
   printf("Number: %d\nCharacter: %c\n", test1->a, test1->b);
   //printf("Field a is at: 0x%02X\nField b is at: 0x%02X\n", );
 
+  struct obj3* test3 = malloc(sizeof(struct obj3));
+
   struct obj2* test2 = malloc(sizeof(struct obj2));
   test2->a = 8;
   test2->b = 9.068;

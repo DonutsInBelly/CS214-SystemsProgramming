@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "mymalloc.h"
 
 #define MAX_SIZE 5000
 #define malloc( x ) mymalloc( x, __FILE__, __LINE__ )
 #define free( x ) myfree( x, __FILE__, __LINE__ )
 
 static char myBlock[MAX_SIZE];
+static int buffer = sizeof(block);
 
 void *mymalloc(size_t size) {
 	static unsigned int callCounter = 0;
@@ -29,20 +31,21 @@ void *mymalloc(size_t size) {
 	int i = 0;
 	// search for open space in block
 	while (i < MAX_SIZE) {
+		int *metaData = (int*)myBlock[i];
 		printf("Current Slot Index: %d value in myBlock: %d\n", i, myBlock[i]);
 		// if index is non-negative and has a value, this slot is allocated
-		if(myBlock[i]>=0) {
-			i = myBlock[i];
-			printf("Moving to next slot at address: 0x%02X at index: %d\n", &myBlock[i], myBlock[i]);
+		if(*metaData>=0) {
+			i = *metaData;
+			printf("Moving to next slot at address: 0x%02X at index: %d\n", &myBlock[i], *metaData);
 			continue;
 		}
 		// if index available
 		// -1 denotes first allocation
-		if (myBlock[i]==-1) {
+		if (*metaData==-1) {
 			// puts index of next Metadata location in this index
 			printf("Current Slot Index: %d value in myBlock: %d\n", i, myBlock[i]);
 			int *nextIndex = (int*)(&myBlock[i]);
-			*nextIndex = (i + 4 + size);
+			*nextIndex = i + 4 + size;
 			printf("Predicted next index: %d\n", i + 4 + size);
 			printf("Metadata index: %d, next slot index: %d\n", i, myBlock[i]);
 			lastAssigned = i;

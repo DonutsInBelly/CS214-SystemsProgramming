@@ -17,7 +17,7 @@ void *mymalloc(size_t size) {
 		size_t i;
 		printf("Entered callCounter = 0 if statement.\n");
 		for (i = 0; i <= 1250; i = i + 4){
-			
+
 			metaData = (int*)(&myBlock[i]);
 			*metaData = 0;
 
@@ -34,46 +34,47 @@ void *mymalloc(size_t size) {
 
 	metaData = (int*)(&myBlock[0]);
 	size_t i = 0;
-	
+
 	while(i < MAX_SIZE){
 
 		metaData = (int*)(&myBlock[i]);
+		printf("Metadata start: %d at index: %d\n", *metaData, i);
 
-		if( *metaData < 0 && *metaData <= -(size +8)){
+		if( *metaData < 0 && *metaData <= -(size +4)){
 			printf("Metadata is negative\n");
 			*metaData = size;
-			int *ptr = (&myBlock[i +size])
-			*ptr = 0;	
 			return &myBlock[i+4];
 		}
 
-		if( *metaData == 0 && 4999 - i >= size + 8){
-			printf("Metadata = 0\n");
+		if( *metaData == 0 && 4999 >= i + size + 8){
 			*metaData = size;
-			int *ptr = (&myBlock[i +size])
+			printf("Metadata = 0: %d\n", *metaData);
+			int *ptr = (int*)(&myBlock[i+4+size]);
 			*ptr = 0;
+			printf("Allocating Index: %d Next index is: %d\n", i , i+size );
 			return &myBlock[i+4];
 		}
 
 		if(*metaData > 0){
 			printf("Metadata > 0: %d\n", *metaData);
 			i = i + *metaData;
-		} 
+			printf("Index: %d\n", i);
+		}
 	}
-
+	printf("%s\n", "Returning Null");
 	return NULL;
 }
 
 void myfree(void *ptr){
-	
+
 	int *ptrInt;
-	
+
 	//Store the first piece of data. +4 to skip metadata.
 	int i;
 	int size;
-	
+
 	for(i = 4; i < MAX_SIZE; i = i + size){
-	
+
 		if(ptr == &myBlock[i]){
 			*ptrInt = *ptrInt * -1;
 			return;

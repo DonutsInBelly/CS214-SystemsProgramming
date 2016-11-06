@@ -15,4 +15,33 @@ typedef struct obj2{
   char c;
 }obj2;
 
+typedef struct obj3{
+  int a;
+  double b;
+  char c;
+  double d;
+  int e;
+  double f;
+  char g;
+  double h;
+  double i;
+  double j;
+  double k;
+  double l;
+  double m;
+  double n;
+  double o;
+  double p;
+  double q;
+  double r;
+  double s;
+  double t;
+  double u;
+  double v;
+  double w;
+  double x;
+  double y;
+  double z;
+}obj3;
+
 #endif

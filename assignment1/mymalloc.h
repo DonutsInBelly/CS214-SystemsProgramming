@@ -9,4 +9,9 @@ void * malloc(size_t size);
 void free();
 */
 
+typedef struct block {
+  int nextIndex;
+  struct block;
+}block;
+
 #endif
