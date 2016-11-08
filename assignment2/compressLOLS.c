@@ -10,6 +10,12 @@ int main(int argc, char const *argv[]) {
     return 1;
   }
   fp = fopen(argv[1], "r");
+  if (fp == NULL) {
+    printf("%s\n", "File could not be opened.");
+    return 1;
+  }
+
+  
 
   return 0;
 }
