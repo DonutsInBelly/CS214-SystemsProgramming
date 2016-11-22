@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <unistd.h>
+#include <ctype.h>
 #include "lols.h"
 
 // test/text1.txt turns into text1.txt
@@ -38,7 +40,7 @@ char *getOutputFile(char *file) {
 
 // if first partition, then add totalsize%howMany and return
 int computePartitionSize(char *file, int howMany, int firstFlag) {
-  if (access(argv[1], F_OK) == -1) {
+  if (access(file, F_OK) == -1) {
     printf("%s\n", "File does not exist");
     return -1;
   }
@@ -47,6 +49,7 @@ int computePartitionSize(char *file, int howMany, int firstFlag) {
 
   fseek(fp, 0, SEEK_END);
   int totalSize = ftell(fp);
+  fclose(fp);
   if(firstFlag) {
     return ((totalSize/howMany)+(totalSize%howMany));
   }

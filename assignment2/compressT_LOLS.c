@@ -63,8 +63,8 @@ int main(int argc, char const *argv[]) {
     return 1;
   }
 
-  fp.close();
-  count.close();
+  fclose(fp);
+  fclose(count);
 
   // Compression starts here
   compressT_LOLS(argv[1], argv[2]);
