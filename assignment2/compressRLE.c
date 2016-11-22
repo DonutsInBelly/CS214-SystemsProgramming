@@ -1,7 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <ctype.h>
 #include "lols.h"
 
 int main(int argc, char const *argv[]) {
@@ -15,6 +11,10 @@ int main(int argc, char const *argv[]) {
     return 1;
   }
   int numberOfParts = atoi(argv[2]);
+
+  /* we could also just default to one part
+   * like if argv[2] does not exist
+   * assume numParts = 0 */
 
   // argv[1] is the name/path to the file
   // Ensures the file is valid

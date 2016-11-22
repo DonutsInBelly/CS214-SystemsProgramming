@@ -1,5 +1,14 @@
+#ifndef STD
+#define STD
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <ctype.h>
+#include <string.h>
+
+#endif
+
 
 #ifndef LOLS_H
 #define  LOLS_H
