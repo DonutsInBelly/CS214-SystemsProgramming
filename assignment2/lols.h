@@ -9,4 +9,14 @@ typedef struct Segment{
   int occurences;
 } Segment;
 
+typedef struct FileData{
+  char* name;
+  char* path;
+  char* fullpath;
+  int partition;
+  int partitionNumber;
+} FileData;
+
+char * getFileName(char *file);
+char * getOutputFile(char *file);
 #endif

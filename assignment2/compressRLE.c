@@ -7,6 +7,15 @@
 int main(int argc, char const *argv[]) {
   FILE *fp;
   FILE *count;
+
+  // argv[2] is the number of parts
+  // Ensures we get a number of parts
+  if (argc != 3) {
+    printf("%s\n", "Error: Incorrect amount of arguments. Please use:\n\"./asst2 [text file to be compressed] [Number of parts]\"");
+    return 1;
+  }
+  int numberOfParts = atoi(argv[2]);
+
   // argv[1] is the name/path to the file
   // Ensures the file is valid
   if (access(argv[1], F_OK) == -1) {
