@@ -1,4 +1,9 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <pthread.h>
+#include <unistd.h>
+#include <ctype.h>
 #include "lols.h"
 
 void *compress(void *vargp) {
