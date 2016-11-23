@@ -63,7 +63,7 @@ void compressR_LOLS(char* file, int parts) {
   int startIndex = 0;
 
   int i;
-  for (i = 0; i < parts-1; i++) {
+  for (i = 0; i < parts; i++) {
     if(partition>totalSize) {
       partition = totalSize;
     }
@@ -74,6 +74,8 @@ void compressR_LOLS(char* file, int parts) {
     info->startIndex = startIndex;
     info->partitionNumber = i;
     info->partition = partition;
+    sprintf(info->path, "%s%d", info->path, i+1);
+    startIndex += partition;
     int pid = fork();
     if(pid == -1) {
       printf("%s\n", "Fork Failed!!");
