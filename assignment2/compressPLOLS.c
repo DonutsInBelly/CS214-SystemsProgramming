@@ -4,6 +4,13 @@
 #include <sys/wait.h>
 #include <errno.h>
 #include "lols.h"
+//include everything just in case
+
+//signal handler here??? need??
+void handler(int sig) {
+  volatile
+
+}
 
 void compressR_LOLS(char* file, int parts) {
   //**--- Routine file checking
@@ -35,7 +42,7 @@ void compressR_LOLS(char* file, int parts) {
    *i'm gonna assume i have a lot of vars that i don't
    *like inputLength and numberOfParts*/
 
-  pid_t * children = malloc(sizeof(pid_t)*numberOfParts);
+  pid_t * children = (pid_t *) malloc(sizeof(pid_t)*numberOfParts);
 
   //parent process waiting on all children
   pid_t p;
@@ -67,7 +74,7 @@ void compressR_LOLS(char* file, int parts) {
     } else {
       //child process, compress here
 
-
+      write();
     }
 
 
