@@ -15,7 +15,6 @@ char *getFileName(char *file) {
     int l = 0;
     dir = strstr(tmp, "/");
     do{
-      printf("%s\n", "loop");
       l = strlen(dir) + 1;
       tmp = &tmp[strlen(tmp)-l+2];
       dir = strstr(tmp, "/");

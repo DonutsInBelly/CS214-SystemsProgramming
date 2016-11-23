@@ -22,23 +22,23 @@ void *compress(void *vargp) {
   fseek(fp, 0L, SEEK_END);
   int size = ftell(fp);
   rewind(fp);
-  printf("%d\n", size);
+  //printf("%d\n", size);
 
   int index = data->startIndex;
   int segIndex = 0;
   Segment seg[size];
   fseek(fp, data->startIndex, SEEK_SET);
   char curr = fgetc(fp);
-  printf("%s\n", "Hello");
+  //printf("%s\n", "Hello");
 
   seg[segIndex].symbol = curr;
   seg[segIndex].occurences = 0;
-  printf("%s\n", "starting looop");
+  //printf("%s\n", "starting looop");
   do {
-    printf("Starting Position: %s \nCurrentIndex: %d with %c\n", data->path,index, curr);
+    //printf("Starting Position: %s \nCurrentIndex: %d with %c\n", data->path,index, curr);
     if(curr != seg[segIndex].symbol && isalpha(curr)) {
       index++; segIndex++;
-      printf("Adding %c to Segments\n", curr);
+      //printf("Adding %c to Segments\n", curr);
       seg[segIndex].symbol = curr;
       seg[segIndex].occurences = 1;
     } else if(curr == seg[segIndex].symbol && isalpha(curr)) {
@@ -58,13 +58,13 @@ void *compress(void *vargp) {
 void writeToFile(char *path, Segment seg) {
   FILE *out = fopen(path, "a");
   if (seg.occurences == 1) {
-    printf("Appending : %c\n", seg.symbol);
+    //printf("Appending : %c\n", seg.symbol);
     fprintf(out, "%c", seg.symbol);
   } else if (seg.occurences == 2) {
-    printf("Appending : %c\n", seg.symbol);
+    //printf("Appending : %c\n", seg.symbol);
     fprintf(out, "%c%c", seg.symbol, seg.symbol);
   } else {
-    printf("Appending : %c\n", seg.symbol);
+    //printf("Appending : %c\n", seg.symbol);
     fprintf(out, "%d%c", seg.occurences, seg.symbol);
   }
 }
