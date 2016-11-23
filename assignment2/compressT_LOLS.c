@@ -72,6 +72,7 @@ void writeToFile(char *path, Segment seg) {
 void compressT_LOLS(char* file, int parts) {
   //**--- Routine file checking
   FILE *fp;
+  FILE *count;
   // file is the name/path to the file
   // Ensures the file is valid
   if (access(file, F_OK) == -1) {
@@ -85,6 +86,16 @@ void compressT_LOLS(char* file, int parts) {
     printf("%s\n", "File could not be opened.");
     return 1;
   }
+
+  // check if parts greater than resources available.
+  count = fopen(file, "r");
+  fseek(count, 0L, SEEK_END);
+  if(ftell(count)<parts) {
+    fclose(count);
+    printf("%s\n", "Amount of parts requested is larger than the actual size of the file to be compressed.");
+    return 1;
+  }
+  fclose(count);
   //**--- End routine file checking
   printf("%s\n", "Finished routine checks");
 
