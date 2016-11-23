@@ -51,7 +51,8 @@ void compressR_LOLS(char* file, int parts) {
   data->name = getFileName(file);
   data->path = getOutputFile(file);
   data->fullpath = file;
-  data->partition = computePartitionSize(file, parts, 0);
+  data->partition = totalSize;
+  data->partitionNumber = 1;
 
   /*parallel processing starts here*/
   /*not sure how connect lols.c soooo
@@ -86,7 +87,14 @@ void compressR_LOLS(char* file, int parts) {
     }
   }
   if(parts == 1) {
-    // UHHHHHHH
+    int pid = fork();
+    if (pid == -1) {
+      printf("%s\n", "Fork Failed!!");
+      return;
+    } else if(pid == 0) {
+      worker(data);
+      exit(0);
+    }
   }
   wait(NULL);
 }
