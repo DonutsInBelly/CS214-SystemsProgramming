@@ -1,13 +1,9 @@
 #include <signal.h>
+#include <wait.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <errno.h>
 #include "lols.h"
-
-//child handling
-void childPID(int index) {
-  children[index] = getpid();
-}
 
 void compressR_LOLS(char* file, int parts) {
   //**--- Routine file checking
@@ -40,33 +36,45 @@ void compressR_LOLS(char* file, int parts) {
    *like inputLength and numberOfParts*/
 
   pid_t * children = malloc(sizeof(pid_t)*numberOfParts);
-  //does it need to be volatile?
 
   //parent process waiting on all children
+  pid_t p;
+  int status;
+  int j = 0;
+  //need to check that children is populated
+  while(j < numberOfParts) {
+    p = waitpid(children[j], &status, WNOHANG);
+    j++;
+  }
 
+
+  //dis where forking starts
   pid_t pid;
 
   int i = 0;
   while (i < numberOfParts) {
     pid = fork();
 
-    if (pid == 0) {
-      //each child compresses here
-      exit(0);
+    if (pid > 0) {
+      children[i] = pid;
       i++;
+      //sleep(1); ?
     } else if (pid < 0){
       //error handling do later
       printf("Fork has failed.\n");
       //perror("Fork has failed");
-      return 0;
+      exit(1);
     } else {
-      printf("Error this code should not be reached\n");
-      return 0;
+      //child process, compress here
+
+
     }
 
-    free(children);
+
 
   }
+
+  free(children);
 }
 
 
