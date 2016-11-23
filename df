@@ -1,0 +1,133 @@
+[1mdiff --git a/assignment2/compressPLOLS.c b/assignment2/compressPLOLS.c[m
+[1mnew file mode 100644[m
+[1mindex 0000000..50f4573[m
+[1m--- /dev/null[m
+[1m+++ b/assignment2/compressPLOLS.c[m
+[36m@@ -0,0 +1,113 @@[m
+[32m+[m[32m#include <signal.h>[m
+[32m+[m[32m#include <sys/types.h>[m
+[32m+[m[32m#include <sys/wait.h>[m
+[32m+[m[32m#include <errno.h>[m
+[32m+[m[32m#include "lols.h"[m
+[32m+[m
+[32m+[m[32m//child handling[m
+[32m+[m[32mvoid childPID(int index) {[m
+[32m+[m[32m  children[index] = getpid();[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mvoid compressR_LOLS(char* file, int parts) {[m
+[32m+[m[32m  //**--- Routine file checking[m
+[32m+[m[32m  FILE *fp;[m
+[32m+[m[32m  // file is the name/path to the file[m
+[32m+[m[32m  // Ensures the file is valid[m
+[32m+[m[32m  if (access(file, F_OK) == -1) {[m
+[32m+[m[32m    printf("%s\n", "File does not exist");[m
+[32m+[m[32m    return 1;[m
+[32m+[m[32m  }[m
+[32m+[m[32m  fp = fopen(file, "r");[m
+[32m+[m
+[32m+[m[32m  // ensures that file streams can open the given file[m
+[32m+[m[32m  if (fp == NULL) {[m
+[32m+[m[32m    printf("%s\n", "File could not be opened.");[m
+[32m+[m[32m    return 1;[m
+[32m+[m[32m  }[m
+[32m+[m[32m  //**--- End routine file checking[m
+[32m+[m[32m  printf("%s\n", "Finished routine checks");[m
+[32m+[m
+[32m+[m[32m  FileData *data = (FileData *)malloc(sizeof(FileData));[m
+[32m+[m[32m  printf("%s\n", "apparently thats legal");[m
+[32m+[m[32m  data->name = getFileName(file);[m
+[32m+[m[32m  data->path = getOutputFile(file);[m
+[32m+[m[32m  data->fullpath = file;[m
+[32m+[m
+[32m+[m[32m  /*parallel processing starts here*/[m
+[32m+[m[32m  /*not sure how connect lols.c soooo[m
+[32m+[m[32m   *i'm gonna assume i have a lot of vars that i don't[m
+[32m+[m[32m   *like inputLength and numberOfParts*/[m
+[32m+[m
+[32m+[m[32m  pid_t * children = malloc(sizeof(pid_t)*numberOfParts);[m
+[32m+[m[32m  //does it need to be volatile?[m
+[32m+[m
+[32m+[m[32m  //parent process waiting on all children[m
+[32m+[m
+[32m+[m[32m  pid_t pid;[m
+[32m+[m
+[32m+[m[32m  int i = 0;[m
+[32m+[m[32m  while (i < numberOfParts) {[m
+[32m+[m[32m    pid = fork();[m
+[32m+[m
+[32m+[m[32m    if (pid == 0) {[m
+[32m+[m[32m      //each child compresses here[m
+[32m+[m[32m      exit(0);[m
+[32m+[m[32m      i++;[m
+[32m+[m[32m    } else if (pid < 0){[m
+[32m+[m[32m      //error handling do later[m
+[32m+[m[32m      printf("Fork has failed.\n");[m
+[32m+[m[32m      //perror("Fork has failed");[m
+[32m+[m[32m      return 0;[m
+[32m+[m[32m    } else {[m
+[32m+[m[32m      printf("Error this code should not be reached\n");[m
+[32m+[m[32m      return 0;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    free(children);[m
+[32m+[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m[32mint main(int argc, char const *argv[]) {[m
+[32m+[m[32m  FILE *fp;[m
+[32m+[m[32m  FILE *count;[m
+[32m+[m
+[32m+[m[32m  // argv[2] is the number of parts[m
+[32m+[m[32m  // Ensures we get a number of parts[m
+[32m+[m[32m  if (argc != 3) {[m
+[32m+[m[32m    printf("%s\n", "Error: Incorrect amount of arguments. Please use:\n\"./asst2 [text file to be compressed] [Number of parts]\"");[m
+[32m+[m[32m    return 1;[m
+[32m+[m[32m  }[m
+[32m+[m[32m  int numberOfParts = atoi(argv[2]);[m
+[32m+[m[32m  printf("%ld\n", numberOfParts);[m
+[32m+[m
+[32m+[m[32m  // argv[1] is the name/path to the file[m
+[32m+[m[32m  // Ensures the file is valid[m
+[32m+[m[32m  if (access(argv[1], F_OK) == -1) {[m
+[32m+[m[32m    printf("%s\n", "File does not exist");[m
+[32m+[m[32m    return 1;[m
+[32m+[m[32m  }[m
+[32m+[m[32m  fp = fopen(argv[1], "r");[m
+[32m+[m[32m  count = fopen(argv[1], "r");[m
+[32m+[m
+[32m+[m[32m  // ensures that both file streams can open the given file[m
+[32m+[m[32m  if (fp == NULL || count == NULL) {[m
+[32m+[m[32m    printf("%s\n", "File could not be opened.");[m
+[32m+[m[32m    return 1;[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  // Count how big the input is[m
+[32m+[m[32m  int inputLength;[m
+[32m+[m[32m  while (fgetc(count) != EOF) {[m
+[32m+[m[32m    inputLength++;[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  fclose(fp);[m
+[32m+[m[32m  fclose(count);[m
+[32m+[m
+[32m+[m[32m  // Compression starts here[m
+[32m+[m[32m  compressR_LOLS(argv[1], argv[2]);[m
+[32m+[m[32m}[m
+[1mdiff --git a/assignment2/lols.c b/assignment2/lols.c[m
+[1mindex 7070ae9..6549dea 100644[m
+[1m--- a/assignment2/lols.c[m
+[1m+++ b/assignment2/lols.c[m
+[36m@@ -1,9 +1,4 @@[m
+[31m-#include <stdio.h>[m
+[31m-#include <stdlib.h>[m
+[31m-#include <string.h>[m
+ #include <pthread.h>[m
+[31m-#include <unistd.h>[m
+[31m-#include <ctype.h>[m
+ #include "lols.h"[m
+ [m
+ // test/text1.txt turns into text1.txt[m
