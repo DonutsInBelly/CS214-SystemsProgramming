@@ -10,8 +10,5 @@ compressT_LOLS:
 compressR_LOLS:
 	$(CC) -o asst2 compressR_LOLS.c compressR_worker_LOLS.c lols.c utils.c $(CFLAGS)
 
-compressLOLS:
-	$(CC) -o asst2 compressLOLS.c $(CFLAGS)
-
 clean:
 	rm -rf asst2
