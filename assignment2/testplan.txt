@@ -1,0 +1,18 @@
+tests to run:
+
+error handling:
+-file does not exist
+-file is empty
+-input parameters don't match expected
+    missing number of parts
+    file is not in form filename.txt
+-input file of just single characters (so expected output would be same as input)
+-total number of characters is not divisible by number of parts
+-number of parts is greater than total number of characters
+
+edge cases:
+-a run of 2 is split
+  ex: aaabbccddde (11 characters divided into 2 parts, expected output: 3a2bc and c3de)
+-very large (over 2000 characters long) input
+-program is shut down unexpectedly
+-non-alpha characters
