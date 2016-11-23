@@ -11,6 +11,7 @@
 #include <errno.h>
 #include "lols.h"
 #include "compressR_worker_LOLS.h"
+#include "utils.h"
 //include everything just in case
 
 void compressR_LOLS(char* file, int parts) {
@@ -47,7 +48,6 @@ void compressR_LOLS(char* file, int parts) {
   pthread_t *threads = malloc(sizeof(pthread_t)*parts);
 
   FileData *data = (FileData *)malloc(sizeof(FileData));
-  printf("%s\n", "apparently thats legal");
   data->name = getFileName(file);
   data->path = getOutputFile(file);
   data->fullpath = file;
@@ -73,48 +73,20 @@ void compressR_LOLS(char* file, int parts) {
     info->fullpath = file;
     info->startIndex = startIndex;
     info->partitionNumber = i;
-  }
-
-  pid_t * children = (pid_t *) malloc(sizeof(pid_t)*parts);
-
-  //parent process waiting on all children
-  pid_t p;
-  int status;
-  int j = 0;
-  //need to check that children is populated
-  while(j < arts) {
-    p = waitpid(children[j], &status, WNOHANG);
-    j++;
-  }
-
-
-  //dis where forking starts
-  pid_t pid;
-
-  int i = 0;
-  while (i < parts) {
-    pid = fork();
-
-    if (pid > 0) {
-      children[i] = pid;
-      i++;
-      //sleep(1); ?
-    } else if (pid < 0){
-      //error handling do later
-      printf("Fork has failed.\n");
-      //perror("Fork has failed");
-      exit(1);
-    } else {
-      //child process, compress here
-
-      write();
+    info->partition = partition;
+    int pid = fork();
+    if(pid == -1) {
+      printf("%s\n", "Fork Failed!!");
+      return;
+    } else if(pid == 0) {
+      worker(info);
+      exit(0);
     }
-
-
-
   }
-
-  free(children);
+  if(parts == 1) {
+    // UHHHHHHH
+  }
+  wait(NULL);
 }
 
 int main(int argc, char const *argv[]) {
@@ -151,3 +123,48 @@ int main(int argc, char const *argv[]) {
   // Compression starts here
   compressR_LOLS(argv[1], numberOfParts);
 }
+
+
+
+
+//
+// pid_t * children = (pid_t *) malloc(sizeof(pid_t)*parts);
+//
+// //parent process waiting on all children
+// pid_t p;
+// int status;
+// int j = 0;
+// //need to check that children is populated
+// while(j < arts) {
+//   p = waitpid(children[j], &status, WNOHANG);
+//   j++;
+// }
+//
+//
+// //dis where forking starts
+// pid_t pid;
+//
+// int i = 0;
+// while (i < parts) {
+//   pid = fork();
+//
+//   if (pid > 0) {
+//     children[i] = pid;
+//     i++;
+//     //sleep(1); ?
+//   } else if (pid < 0){
+//     //error handling do later
+//     printf("Fork has failed.\n");
+//     //perror("Fork has failed");
+//     exit(1);
+//   } else {
+//     //child process, compress here
+//
+//     write();
+//   }
+//
+//
+//
+// }
+//
+// free(children);

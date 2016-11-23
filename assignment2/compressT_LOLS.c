@@ -102,7 +102,6 @@ void compressT_LOLS(char* file, int parts) {
   pthread_t *threads = malloc(sizeof(pthread_t)*parts);
 
   FileData *data = (FileData *)malloc(sizeof(FileData));
-  printf("%s\n", "apparently thats legal");
   data->name = getFileName(file);
   data->path = getOutputFile(file);
   data->fullpath = file;
