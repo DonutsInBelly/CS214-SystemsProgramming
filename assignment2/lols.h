@@ -15,6 +15,7 @@ typedef struct FileData{
   char* fullpath;
   int partition;
   int partitionNumber;
+  int startIndex;
 } FileData;
 
 char * getFileName(char *file);

@@ -6,6 +6,69 @@
 #include <ctype.h>
 #include "lols.h"
 
+void *compress(void *vargp) {
+  FileData *data = (FileData *)vargp;
+  char * tmp = data->fullpath;
+  FILE *fp = fopen(tmp, "r");
+
+  FILE *out = fopen(data->path, "a");
+  /*
+  if (access(data->path, F_OK) != -1 ) {
+    fclose(fp);
+    fclose(out);
+    return NULL;
+  }*/
+
+  fseek(fp, 0L, SEEK_END);
+  int size = ftell(fp);
+  rewind(fp);
+  printf("%d\n", size);
+
+  int index = data->startIndex;
+  int segIndex = 0;
+  Segment seg[size];
+  fseek(fp, data->startIndex, SEEK_SET);
+  char curr = fgetc(fp);
+  printf("%s\n", "Hello");
+
+  seg[segIndex].symbol = curr;
+  seg[segIndex].occurences = 0;
+  printf("%s\n", "starting looop");
+  do {
+    printf("Starting Position: %s \nCurrentIndex: %d with %c\n", data->path,index, curr);
+    if(curr != seg[segIndex].symbol && isalpha(curr)) {
+      index++; segIndex++;
+      printf("Adding %c to Segments\n", curr);
+      seg[segIndex].symbol = curr;
+      seg[segIndex].occurences = 1;
+    } else if(curr == seg[segIndex].symbol && isalpha(curr)) {
+      seg[segIndex].occurences += 1;
+    }
+    curr = fgetc(fp); index++;
+  } while(index < (data->startIndex + data->partition+1));
+  int k;
+  for (k = segIndex; k >= 0; k--) {
+    writeToFile(data->path, seg[k]);
+  }
+  printf("%s\n", "done");
+  fclose(fp);
+  fclose(out);
+}
+
+void writeToFile(char *path, Segment seg) {
+  FILE *out = fopen(path, "a");
+  if (seg.occurences == 1) {
+    printf("Appending : %c\n", seg.symbol);
+    fprintf(out, "%c", seg.symbol);
+  } else if (seg.occurences == 2) {
+    printf("Appending : %c\n", seg.symbol);
+    fprintf(out, "%c%c", seg.symbol, seg.symbol);
+  } else {
+    printf("Appending : %c\n", seg.symbol);
+    fprintf(out, "%d%c", seg.occurences, seg.symbol);
+  }
+}
+
 void compressT_LOLS(char* file, int parts) {
   //**--- Routine file checking
   FILE *fp;
@@ -25,14 +88,39 @@ void compressT_LOLS(char* file, int parts) {
   //**--- End routine file checking
   printf("%s\n", "Finished routine checks");
 
+  pthread_t *threads = malloc(sizeof(pthread_t)*parts);
+
   FileData *data = (FileData *)malloc(sizeof(FileData));
   printf("%s\n", "apparently thats legal");
   data->name = getFileName(file);
   data->path = getOutputFile(file);
   data->fullpath = file;
+  data->partition = computePartitionSize(file, parts, 0);
 
-  pthread_t threads[parts];
-
+  int threadCount;
+  int totalBytesRead = 0;
+  for (threadCount = 0; threadCount < parts; threadCount++) {
+    FileData *threadData = (FileData *)malloc(sizeof(FileData));
+    threadData->name = getFileName(file);
+    threadData->path = getOutputFile(file);
+    sprintf(threadData->path, "%s%d", threadData->path, threadCount+1);
+    printf("%s\n", threadData->path);
+    threadData->fullpath = file;
+    threadData->partitionNumber = threadCount;
+    if(threadCount == 0) {
+      threadData->partition = computePartitionSize(file, parts, 1);
+    } else {
+      threadData->partition = computePartitionSize(file, parts, 0);
+    }
+    threadData->startIndex = totalBytesRead;
+    printf("Start: %d\n", threadData->startIndex);
+    totalBytesRead += threadData->partition;
+    pthread_create(&threads[threadCount], NULL, compress, (void *)threadData);
+  }
+  int j;
+  for (j = 0; j < parts; j++) {
+    pthread_join(threads[j], NULL);
+  }
 }
 
 int main(int argc, char const *argv[]) {
@@ -67,5 +155,5 @@ int main(int argc, char const *argv[]) {
   fclose(count);
 
   // Compression starts here
-  compressT_LOLS(argv[1], argv[2]);
+  compressT_LOLS(argv[1], numberOfParts);
 }
