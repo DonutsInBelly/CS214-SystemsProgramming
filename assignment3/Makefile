@@ -7,5 +7,8 @@ libnetfiles:
 simpleserver:
 	$(CC) -o simpleserver.o simpleserver.c $(CFLAGS)
 
+testserver:
+	$(CC) -o testserver.o testserver.c $(CFLAGS)
+
 clean:
 	rm *.o

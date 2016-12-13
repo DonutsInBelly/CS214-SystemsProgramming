@@ -5,14 +5,14 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>
-#include <netinet/in.h>
 #include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
-#include <fcntl.h>
+#include <errno.h>
 
 #define PORT "5555"
 #define INVALID_FILE_MODE -214
+#define MAXBUFFERSIZE 512
 
 // Global Variables
 int initCalled = 0; // boolean to check if netserverinit() was called successfully
@@ -27,7 +27,7 @@ int netopen(const char *pathname, int flags) {
     exit(-1);
   }
 
-  // Get socket descriptor and connect
+  // Get socket descriptor and connect to it
   int sockfd = -1;
   sockfd = socket(serveraddrinfo->ai_family, serveraddrinfo->ai_socktype, serveraddrinfo->ai_protocol);
   int connectionStatus = connect(sockfd, serveraddrinfo->ai_addr, serveraddrinfo->ai_addrlen);
@@ -35,6 +35,28 @@ int netopen(const char *pathname, int flags) {
     perror("connect");
     return -1;
   }
+
+  // Print that we've connected to the IP Address
+  char ipstring[INET_ADDRSTRLEN];
+  inet_ntop(serveraddrinfo->ai_family, (void *)((struct sockaddr *)serveraddrinfo->ai_addr), ipstring, sizeof ipstring);
+  printf("netopen: Connected to %s\n", ipstring);
+
+  // Setup to receive data
+  char buffer[MAXBUFFERSIZE];
+  int msg;
+  if ((msg = recv(sockfd, buffer, MAXBUFFERSIZE-1, 0)) == -1) {
+    perror("netopen recv");
+    exit(1);
+  }
+  buffer[msg] = '\0';
+  printf("Received: %s\n", buffer);
+
+  // Time to get serious: send the message type
+  if (send(sockfd, "open", 4, 0) == -1) {
+    perror("netopen send messagetype");
+  }
+  close(sockfd);
+
   return 0;
 }
 
