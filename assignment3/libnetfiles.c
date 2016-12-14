@@ -127,7 +127,7 @@ int netserverinit(char *hostname, int filemode) {
 
 // Debugging
 int main(int argc, char const *argv[]) {
-  netserverinit("localhost", 0.5);
+  netserverinit("cd.cs.rutgers.edu", 0.5);
   netopen("/home/carlin/Documents/bs.txt", O_RDWR);
   return 0;
 }
