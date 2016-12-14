@@ -38,6 +38,12 @@ int netopen(const char *pathname, int flags) {
   inet_ntop(serveraddrinfo->ai_family, (void *)((struct sockaddr *)serveraddrinfo->ai_addr), ipstring, sizeof ipstring);
   printf("netopen: Connected to %s\n", ipstring);
 
+  // Time to get serious: send the message type
+  int msgtype = htonl(NETOPEN);
+  if (send(sockfd, &msgtype, sizeof(int), 0) == -1) {
+    perror("netopen send messagetype");
+  }
+
   // Setup to receive data
   char buffer[MAXBUFFERSIZE];
   int msg;
@@ -47,11 +53,6 @@ int netopen(const char *pathname, int flags) {
   }
   buffer[msg] = '\0';
   printf("Received: %s\n", buffer);
-
-  // Time to get serious: send the message type
-  if (send(sockfd, "open", 4, 0) == -1) {
-    perror("netopen send messagetype");
-  }
   close(sockfd);
 
   return 0;
