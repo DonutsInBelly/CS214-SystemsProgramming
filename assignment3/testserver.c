@@ -10,14 +10,57 @@
 #include <arpa/inet.h>
 #include <sys/wait.h>
 #include <signal.h>
-#include "testserver.h"
+#include "master.h"
 
 void *msg_handler(void *vargp) {
   MsgData *first = (MsgData *)vargp;
+  char buffer[MAXBUFFERSIZE];
 
+  // NetOpen: 1
+  // NetRead: 2
+  // NetWrite: 3
+  // NetClose: 4
   switch (first->msg_type) {
     case 1:
-      printf("NetOpen requested from %s\n", first->ip_address);
+      printf("NetOpen: Request from %s\n", first->ip_address);
+      // wait for pathname
+      printf("NetOpen: Waiting for path message...\n");
+      int pathmsg;
+      if ((pathmsg = recv(first->clientfd, buffer, sizeof(NetOpen), 0)) == -1) {
+        perror("netopen path");
+        exit(1);
+      }
+      buffer[pathmsg] = '\0';
+      printf("NetOpen: Received path: %s\n", buffer);
+
+      printf("NetOpen: Waiting for flags message...\n");
+      int flagsrecv;
+      int flagsmsg;
+      if ((flagsmsg = recv(first->clientfd, &flagsrecv, sizeof(int), 0)) == -1) {
+        perror("netopen flags");
+      }
+      int flags = ntohl(flagsmsg);
+      printf("NetOpen: Received flags: %x\n", flags);
+
+      // try actually open()ing the file and then sending the result FD back
+      printf("NetOpen: Trying to open the file\n");
+      int result = open(buffer, flags);
+      int resultpayload = htonl(result);
+      printf("NetOpen: Sending netopen result: %x\n", resultpayload);
+      if (send(first->clientfd, &resultpayload, sizeof(int), 0) == -1) {
+        perror("netopen send result");
+      }
+      // if there was an error getting the resulting FD
+      if (result == -1) {
+        // send serrno across the wire
+        printf("NetOpen: Sending errno :%x\n", errno);
+        int errnopayload = htonl(errno);
+        if (send(first->clientfd, &errnopayload, sizeof(int), 0) == -1) {
+          perror("netopen send errno");
+        }
+      }
+      printf("NetOpen: Finished Operation.\n");
+      close(first->clientfd);
       break;
     case 2:
       printf("NetRead requested from %s\n", first->ip_address);
@@ -52,7 +95,7 @@ int main(int argc, char const *argv[]) {
   sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 
   // binds the socket descriptor to the ip
-  printf("Binding socket descriptor to IP Address %s...\n", res->ai_addr);
+  printf("Binding socket descriptor to IP Address Info...\n");
   bind(sockfd, res->ai_addr, res->ai_addrlen);
 
   // sets the socket descriptor to listen for connections
@@ -63,6 +106,7 @@ int main(int argc, char const *argv[]) {
   socklen_t addr_size;
   while (1) {
     // accept() waits for connections to come in to connect to
+    printf("Waiting to accept new connections...\n");
     addr_size = sizeof clientAddr;
     recfd = accept(sockfd, (struct sockaddr *)&clientAddr, &addr_size);
     if (recfd == -1) {
@@ -76,7 +120,7 @@ int main(int argc, char const *argv[]) {
     // Set up message to pass to msg_handler()
     MsgData *data = malloc(sizeof(MsgData));
     strcpy(data->ip_address, currentAddr);
-    data->sockfd = sockfd;
+    data->clientfd = recfd;
 
     // Receiving the first message from the client
     int msg_type;
