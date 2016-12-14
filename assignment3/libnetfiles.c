@@ -9,10 +9,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
-
-#define PORT "5555"
-#define INVALID_FILE_MODE -214
-#define MAXBUFFERSIZE 512
+#include "libnetfiles.h"
 
 // Global Variables
 int initCalled = 0; // boolean to check if netserverinit() was called successfully
