@@ -1,6 +1,8 @@
 CC = gcc
 CFLAGS = -Wall -lm -g -pthread
 
+all: libnetfiles netfileserver
+
 libnetfiles:
 	$(CC) -o libnet.o libnetfiles.c $(CFLAGS)
 
