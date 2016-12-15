@@ -1,0 +1,8 @@
+So far, all we've implemented is the base program which allows a client to open, read, write and close files on our file server.
+
+For the server, run "make testserver" which gives you an executable: testserver.o
+Please run ./testserver.o on cd.cs.rutgers.edu before the client.
+
+For the client, run "make" or "make libnetfiles"
+The executable is called libnet.o
+libnet.o tests all the functions.
