@@ -4,6 +4,12 @@ CFLAGS = -Wall -lm -g -pthread
 libnetfiles:
 	$(CC) -o libnet.o libnetfiles.c $(CFLAGS)
 
+libnetfilestest:
+	$(CC) -o libnettest.o libnetfilestest.c $(CFLAGS)
+
+server:
+	$(CC) -o server.o server.c $(CFLAGS)
+
 netfileserver:
 	$(CC) -o netfileserver.o netfileserver.c $(CFLAGS)
 
