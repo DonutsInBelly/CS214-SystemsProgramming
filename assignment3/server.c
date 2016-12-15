@@ -124,7 +124,7 @@ void *msg_handler(void *vargp) {
         }
       } else {
         // send the buffer that was read
-        printf("NetRead: Sending buffer :%s\n", buffer);
+        printf("NetRead: Sending buffer: %s\n", buffer);
         if (send(first->clientfd, buffer, readresult, 0) == -1) {
           perror("netread send buffer");
         }
