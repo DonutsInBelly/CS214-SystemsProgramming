@@ -133,7 +133,7 @@ void *msg_handler(void *vargp) {
       close(first->clientfd);
       break;
 
-    case 3:
+    case NETWRITE:
       printf("NetWrite: Request from %s\n", first->ip_address);
 
       // Waiting for file descriptor
@@ -191,7 +191,7 @@ void *msg_handler(void *vargp) {
       printf("NetWrite: Finished Operation.\n");
       close(first->clientfd);
       break;
-    case 4:
+    case NETCLOSE:
       printf("NetClose requested from %s\n", first->ip_address);
 
       // Waiting for file descriptor
@@ -277,11 +277,21 @@ int main(int argc, char const *argv[]) {
     strcpy(data->ip_address, currentAddr);
     data->clientfd = recfd;
 
+    // Receiving File Mode
+    int filemode;
+    int modemsg;
+    if ((modemsg = recv(recfd, &filemode, sizeof(filemode), 0)) == -1) {
+      perror("main mode recv");
+    }
+    int mode = ntohl(filemode);
+    data->filemode = mode;
+    printf("Received: Filemode %d from %s\n", mode, currentAddr);
+
     // Receiving the first message from the client
     int msg_type;
     int msg;
     if ((msg = recv(recfd, &msg_type, sizeof(int), 0)) == -1) {
-      perror("main recv");
+      perror("main msg_type recv");
       exit(1);
     }
     data->msg_type = ntohl(msg_type);

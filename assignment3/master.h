@@ -17,11 +17,7 @@ typedef struct MsgData {
   char ip_address[INET_ADDRSTRLEN];
   int clientfd;
   int msg_type;
+  int filemode;
 } MsgData;
-
-typedef struct NetOpen {
-  char path[MAXBUFFERSIZE-1];
-  int flags;
-} NetOpen;
 
 #endif

@@ -40,6 +40,15 @@ int netopen(const char *pathname, int flags) {
 
   // wait for server to get ready to receive
   sleep(1);
+  // Send the mode
+  printf("netopen: Sending File Mode message...\n");
+  int openmodemsg = htonl(connectionMode);
+  if (send(sockfd, &openmodemsg, sizeof(openmodemsg), 0) == -1) {
+    perror("netopen send file mode");
+  }
+
+  // wait for server to get ready to receive
+  sleep(1);
   // Time to get serious: send the message type
   printf("netopen: Sending NETOPEN message...\n");
   int msgtype = htonl(NETOPEN);
@@ -111,6 +120,15 @@ ssize_t netread(int filedes, void *buf, size_t nbyte) {
 
   // wait for server to get ready to receive
   sleep(1);
+  // Send the mode
+  printf("netread: Sending File Mode message...\n");
+  int readmodemsg = htonl(connectionMode);
+  if (send(sockfd, &readmodemsg, sizeof(readmodemsg), 0) == -1) {
+    perror("netread send file mode");
+  }
+
+  // wait for server to get ready to receive
+  sleep(1);
   // Time to get serious: send the message type
   printf("netread: Sending NETREAD message...\n");
   int msgtype = htonl(NETREAD);
@@ -167,7 +185,7 @@ ssize_t netread(int filedes, void *buf, size_t nbyte) {
 
 ssize_t netwrite(int filedes, const void *buf, size_t nbyte) {
   if (!initCalled) {
-    fprintf(stderr, "netread: %s\n", "netread() called before netserverinit()");
+    fprintf(stderr, "netwrite: %s\n", "netwrite() called before netserverinit()");
     exit(-1);
   }
 
@@ -184,6 +202,15 @@ ssize_t netwrite(int filedes, const void *buf, size_t nbyte) {
   char ipstring[INET_ADDRSTRLEN];
   inet_ntop(serveraddrinfo->ai_family, (void *)((struct sockaddr *)serveraddrinfo->ai_addr), ipstring, sizeof ipstring);
   printf("netwrite: Connected to %s\n", ipstring);
+
+  // wait for server to get ready to receive
+  sleep(1);
+  // Send the mode
+  printf("netwrite: Sending File Mode message...\n");
+  int writemodemsg = htonl(connectionMode);
+  if (send(sockfd, &writemodemsg, sizeof(writemodemsg), 0) == -1) {
+    perror("netwrite send file mode");
+  }
 
   // wait for server to get ready to receive
   sleep(1);
@@ -264,6 +291,15 @@ int netclose(int fd){
 
   // wait for server to get ready to receive
   sleep(1);
+  // Send the mode
+  printf("netclose: Sending File Mode message...\n");
+  int closemodemsg = htonl(connectionMode);
+  if (send(sockfd, &closemodemsg, sizeof(closemodemsg), 0) == -1) {
+    perror("netclose send file mode");
+  }
+
+  // wait for server to get ready to receive
+  sleep(1);
   // Time to get serious: send the message type
   printf("netclose: Sending NETCLOSE message...\n");
   int msgtype = htonl(NETCLOSE);
@@ -285,7 +321,7 @@ int netclose(int fd){
   int resultclose;
   int resultmsg;
   if ((resultmsg = recv(sockfd, &resultclose, sizeof(resultclose), 0)) == -1) {
-    perror("netwrite recv result");
+    perror("netclose recv result");
   }
   int result = ntohl(resultclose);
   printf("netwclose: Received close result: %d\n", result);
