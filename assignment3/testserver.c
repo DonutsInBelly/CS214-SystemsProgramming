@@ -16,6 +16,8 @@ void *msg_handler(void *vargp) {
   MsgData *first = (MsgData *)vargp;
   char buffer[MAXBUFFERSIZE];
 
+  pthread_detach(child);
+
   // NetOpen: 1
   // NetRead: 2
   // NetWrite: 3
