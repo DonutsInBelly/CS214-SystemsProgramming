@@ -6,3 +6,5 @@ Please run ./testserver.o on cd.cs.rutgers.edu before the client.
 For the client, run "make" or "make libnetfiles"
 The executable is called libnet.o
 libnet.o tests all the functions.
+
+To remove the executables, run "make clean"
