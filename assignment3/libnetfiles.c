@@ -9,7 +9,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
-#include "master.h"
+#include "libnetfiles.h"
 
 // Global Variables
 int initCalled = 0; // boolean to check if netserverinit() was called successfully

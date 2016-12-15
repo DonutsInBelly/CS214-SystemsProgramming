@@ -12,7 +12,7 @@
 #include <signal.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include "master.h"
+#include "libnetfiles.h"
 
 // Global Variables
 int fdtracker[512] = {0};

@@ -4,6 +4,6 @@ Run "make"
 First, run the server "./netfileserver.o" on cd.cs.rutgers.edu
 The client executable is called libnet.o
 "./libnet.o" is the client
-Both files are dependent upon master.h
+Both files are dependent upon libnetfiles.h
 
 To remove the executables, run "make clean"
