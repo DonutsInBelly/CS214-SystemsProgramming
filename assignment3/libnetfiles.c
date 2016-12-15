@@ -160,7 +160,6 @@ ssize_t netread(int filedes, void *buf, size_t nbyte) {
     if (recv(sockfd, resultstr, nbyte, 0) == -1) {
       perror("netread recv resultstr");
     }
-    printf("%s\n", "hi");
   }
   close(sockfd);
   return result;
@@ -280,6 +279,17 @@ int netclose(int fd){
   if (send(sockfd, &filedespayload, sizeof(int), 0) == -1) {
     perror("netclose send filedespayload");
   }
+
+  // Setup to receive result
+  printf("netclose: Waiting to receive the result\n");
+  int resultclose;
+  int resultmsg;
+  if ((resultmsg = recv(sockfd, &resultclose, sizeof(resultclose), 0)) == -1) {
+    perror("netwrite recv result");
+  }
+  int result = ntohl(resultclose);
+  printf("netwclose: Received close result: %d\n", result);
+  return result;
 }
 
 // verifies that the host exists.
@@ -322,13 +332,13 @@ int main(int argc, char const *argv[]) {
   char res[MAXBUFFERSIZE];
   char random[MAXBUFFERSIZE];
   int bsfd = open("/home/carlin/Documents/bs.txt", O_RDWR);
-  int result = read(bsfd, random, 16);
-  write(bsfd, "lol", 3);
+  int result = read(bsfd, random, 4);
+  write(bsfd, "lol", 100);
   printf("%s\n", random);
   netserverinit("localhost", 0.5);
   int fd = netopen("/home/carlin/Documents/bs.txt", O_RDWR);
   netread(fd, res, 4);
-  netwrite(fd, "lolol", 16);
+  netwrite(fd, random, 16);
   netclose(fd);
   return 0;
 }

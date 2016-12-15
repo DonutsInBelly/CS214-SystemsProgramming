@@ -210,7 +210,11 @@ void *msg_handler(void *vargp) {
       sleep(1);
 
       int closed = close(closefd);
-
+      int closedresultpayload = htonl(closed);
+      if (send(first->clientfd, &closedresultpayload, sizeof(closedresultpayload), 0) == -1) {
+        perror("netwrite send result");
+      }
+      // if there was an error getting the resulting size
       //error: send errno back
       if (closed == -1) {
         printf("NetClose: Sending errno :%d\n", errno);
