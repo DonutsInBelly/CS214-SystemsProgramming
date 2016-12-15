@@ -86,7 +86,7 @@ int netopen(const char *pathname, int flags) {
   }
   close(sockfd);
 
-  return 0;
+  return result;
 }
 
 ssize_t netread(int filedes, void *buf, size_t nbyte) {
@@ -147,6 +147,7 @@ ssize_t netread(int filedes, void *buf, size_t nbyte) {
   printf("netread: Received result size: %d!\n", result);
 
   // check result and see if any errors
+  printf("netread: Checking for errors\n");
   if (result == -1) {
     int err;
     // if there was an error, receive the errno
@@ -154,13 +155,19 @@ ssize_t netread(int filedes, void *buf, size_t nbyte) {
       perror("netread recv err");
     }
   } else {
-    char resultstr[result];
-    if (resultmsg = recv(sockfd, resultstr, strlen(result), 0) == -1) {
+    printf("netread: No errors, sending resulting string\n");
+    char resultstr[MAXBUFFERSIZE];
+    if (recv(sockfd, resultstr, nbyte, 0) == -1) {
       perror("netread recv resultstr");
     }
-    printf("%s\n", resultstr);
+    printf("%s\n", "hi");
   }
   close(sockfd);
+  return result;
+}
+
+ssize_t netwrite(int filedes, const void *buf, size_t nbyte) {
+  //
 }
 
 // verifies that the host exists.

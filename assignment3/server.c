@@ -53,7 +53,7 @@ void *msg_handler(void *vargp) {
       printf("NetOpen: Trying to open the file\n");
       int result = open(buffer, flags);
       printf("NetOpen: Sending netopen result: %i\n", result);
-      int resultpayload = ntohl(result);
+      int resultpayload = htonl(result);
       if (send(first->clientfd, &resultpayload, sizeof(int), 0) == -1) {
         perror("netopen send result");
       }
@@ -107,8 +107,7 @@ void *msg_handler(void *vargp) {
       // Time to actually read() the file
       printf("NetRead: Trying to read the file\n");
       bzero(buffer, MAXBUFFERSIZE);
-      int bsfd = open("/home/carlin/Documents/bs.txt", O_RDWR);
-      printf("readfd: %d, nbyte: %d\n", readfd, nbyte);
+      //printf("readfd: %d, nbyte: %d\n", readfd, nbyte);
       int readresult = read(readfd, buffer, nbyte);
       printf("NetRead: Buffer Result: %s\n", buffer);
       int readresultpayload = htonl(readresult);
@@ -135,7 +134,9 @@ void *msg_handler(void *vargp) {
       break;
 
     case 3:
-      printf("NetWrite requested from %s\n", first->ip_address);
+      printf("NetWrite: Request from %s\n", first->ip_address);
+
+      // Wait for
       break;
     case 4:
       printf("NetClose requested from %s\n", first->ip_address);
