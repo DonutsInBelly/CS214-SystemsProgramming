@@ -33,7 +33,7 @@ void *msg_handler(void *vargp) {
       // wait for pathname
       printf("NetOpen: Waiting for path message...\n");
       int pathmsg;
-      if ((pathmsg = recv(first->clientfd, buffer, sizeof(NetOpen), 0)) == -1) {
+      if ((pathmsg = recv(first->clientfd, buffer, MAXBUFFERSIZE, 0)) == -1) {
         perror("netopen path");
         exit(1);
       }
@@ -136,10 +136,91 @@ void *msg_handler(void *vargp) {
     case 3:
       printf("NetWrite: Request from %s\n", first->ip_address);
 
-      // Wait for
+      // Waiting for file descriptor
+      printf("NetWrite: Waiting for File Descriptor...\n");
+      int fdrecv;
+      int fdmsg;
+      if ((fdmsg = recv(first->clientfd, &fdrecv, sizeof(fdrecv), 0)) == -1) {
+        perror("netwrite filedesmsg");
+      }
+      int writefd = ntohl(fdrecv);
+      printf("NetWrite: Received File Descriptor: %i\n", readfd);
+      if(writefd < 0) {
+        printf("%d\n", writefd);
+      }
+
+      // Waiting for nbyte size
+      printf("NetWrite: Waiting for nbyte size...\n");
+      size_t writenbyterecv;
+      int writenbytemsg;
+      if ((writenbytemsg = recv(first->clientfd, &nbyterecv, sizeof(writenbyterecv), 0)) == -1) {
+        perror("netwrite nbyte");
+      }
+      size_t writenbyte = ntohl(writenbyterecv);
+      printf("Netwrite: Received nbyte: %d\n", writenbyte);
+
+      // wait for buffer
+      printf("NetWrite: Waiting for string to write in file...\n");
+      int stringmsg;
+      if ((stringmsg = recv(first->clientfd, buffer, MAXBUFFERSIZE, 0)) == -1) {
+        perror("netwrite path");
+        exit(1);
+      }
+      buffer[stringmsg] = '\0';
+      printf("NetWrite: Received path: %s\n", buffer);
+
+      sleep(1);
+      // Time to actually read() the file
+      printf("NetWrite: Trying to write to the file\n");
+      //printf("readfd: %d, nbyte: %d\n", readfd, nbyte);
+      int writeresult = write(writefd, buffer, writenbyte);
+      printf("NetWrite: Write Result: %s\n", writeresult);
+      int writeresultpayload = htonl(readresult);
+      if (send(first->clientfd, &writeresultpayload, sizeof(writeresultpayload), 0) == -1) {
+        perror("netwrite send result");
+      }
+      // if there was an error getting the resulting size
+      if (writeresult == -1) {
+        // send serrno across the wire
+        printf("NetWrite: Sending errno :%d\n", errno);
+        errnopayload = htonl(errno);
+        if (send(first->clientfd, &errnopayload, sizeof(errnopayload), 0) == -1) {
+          perror("netwrite send errno");
+        }
+      }
+      printf("NetWrite: Finished Operation.\n");
+      close(first->clientfd);
       break;
     case 4:
       printf("NetClose requested from %s\n", first->ip_address);
+
+      // Waiting for file descriptor
+      printf("NetClose: Waiting for File Descriptor...\n");
+      int closerecv;
+      int closemsg;
+      if ((closemsg = recv(first->clientfd, &closerecv, sizeof(closerecv), 0)) == -1) {
+        perror("netclose closemsg");
+      }
+      int closefd = ntohl(filedesrecv);
+      printf("NetClose: Received File Descriptor: %i\n", closefd);
+      if(closefd < 0) {
+        printf("%d\n", closefd);
+      }
+
+      sleep(1);
+
+      int closed = close(closefd);
+
+      //error: send errno back
+      if (closed == -1) {
+        printf("NetClose: Sending errno :%d\n", errno);
+        errnopayload = htonl(errno);
+        if (send(first->clientfd, &errnopayload, sizeof(errnopayload), 0) == -1) {
+          perror("netclose send errno");
+        }
+      }
+      printf("NetClose: Finished Operation.\n");
+      close(first->clientfd);
       break;
   }
 }

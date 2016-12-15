@@ -43,7 +43,7 @@ int netopen(const char *pathname, int flags) {
   // Time to get serious: send the message type
   printf("netopen: Sending NETOPEN message...\n");
   int msgtype = htonl(NETOPEN);
-  if (send(sockfd, &msgtype, sizeof(int), 0) == -1) {
+  if (send(sockfd, &msgtype, sizeof(msgtype), 0) == -1) {
     perror("netopen send messagetype");
   }
 
@@ -60,7 +60,7 @@ int netopen(const char *pathname, int flags) {
   // Send flags
   printf("netopen: Sending Flags...\n");
   int flagspayload = htonl(flags);
-  if (send(sockfd, &flagspayload, sizeof(int), 0) == -1) {
+  if (send(sockfd, &flagspayload, sizeof(flagspayload), 0) == -1) {
     perror("netopen send flags");
   }
 
@@ -68,27 +68,219 @@ int netopen(const char *pathname, int flags) {
   printf("netopen: Waiting to receive the result\n");
   int resultFD;
   int resultmsg;
-  if ((resultmsg = recv(sockfd, &resultFD, sizeof(int), 0)) == -1) {
+  if ((resultmsg = recv(sockfd, &resultFD, sizeof(resultFD), 0)) == -1) {
     perror("netopen recv result");
     exit(1);
   }
   int result = ntohl(resultFD);
-  printf("Received result FD of netopen!\n");
+  printf("netopen: received result FD!\n");
 
   // check result and see if any errors
+  int err;
   if (result == -1) {
     // if there was an error, receive the errno
-    if ((resultmsg = recv(sockfd, &resultFD, sizeof(int), 0)) == -1) {
-      perror("netopen recv result");
-      exit(1);
+    if ((resultmsg = recv(sockfd, &err, sizeof(err), 0)) == -1) {
+      perror("netopen recv err");
     }
+    errno = ntohl(err);
   }
   close(sockfd);
 
-  return 0;
+  return result;
 }
 
+ssize_t netread(int filedes, void *buf, size_t nbyte) {
+  if (!initCalled) {
+    fprintf(stderr, "netread: %s\n", "netread() called before netserverinit()");
+    exit(-1);
+  }
 
+  // Get socket descriptor and connect to it
+  int sockfd = -1;
+  sockfd = socket(serveraddrinfo->ai_family, serveraddrinfo->ai_socktype, serveraddrinfo->ai_protocol);
+  int connectionStatus = connect(sockfd, serveraddrinfo->ai_addr, serveraddrinfo->ai_addrlen);
+  if (connectionStatus != 0) {
+    perror("connect");
+    return -1;
+  }
+
+  // Print that we've connected to the IP Address
+  char ipstring[INET_ADDRSTRLEN];
+  inet_ntop(serveraddrinfo->ai_family, (void *)((struct sockaddr *)serveraddrinfo->ai_addr), ipstring, sizeof ipstring);
+  printf("netread: Connected to %s\n", ipstring);
+
+  // wait for server to get ready to receive
+  sleep(1);
+  // Time to get serious: send the message type
+  printf("netread: Sending NETREAD message...\n");
+  int msgtype = htonl(NETREAD);
+  if (send(sockfd, &msgtype, sizeof(int), 0) == -1) {
+    perror("netread send messagetype");
+  }
+
+  // wait for server to get ready to receive
+  sleep(1);
+  // Send File Descriptor
+  printf("netread: Sending File Descriptor...\n");
+  int filedespayload = htonl(filedes);
+  if (send(sockfd, &filedespayload, sizeof(int), 0) == -1) {
+    perror("netread send filedespayload");
+  }
+
+  // wait for server to get ready to receive
+  sleep(1);
+  // Send size
+  printf("netread: Sending nbyte...%d\n", nbyte);
+  int sizepayload = htonl(nbyte);
+  if (send(sockfd, &sizepayload, sizeof(int), 0) == -1) {
+    perror("netread send sizepayload");
+  }
+
+  // Setup to receive result
+  printf("netread: Waiting to receive the result\n");
+  int resultsize;
+  int resultmsg;
+  if ((resultmsg = recv(sockfd, &resultsize, sizeof(resultsize), 0)) == -1) {
+    perror("netread recv result");
+  }
+  int result = ntohl(resultsize);
+  printf("netread: Received result size: %d!\n", result);
+
+  // check result and see if any errors
+  printf("netread: Checking for errors\n");
+  if (result == -1) {
+    int err;
+    // if there was an error, receive the errno
+    if ((resultmsg = recv(sockfd, &err, sizeof(err), 0)) == -1) {
+      perror("netread recv err");
+    }
+  } else {
+    printf("netread: No errors, sending resulting string\n");
+    char resultstr[MAXBUFFERSIZE];
+    if (recv(sockfd, resultstr, nbyte, 0) == -1) {
+      perror("netread recv resultstr");
+    }
+    printf("%s\n", "hi");
+  }
+  close(sockfd);
+  return result;
+}
+
+ssize_t netwrite(int filedes, const void *buf, size_t nbyte) {
+  if (!initCalled) {
+    fprintf(stderr, "netread: %s\n", "netread() called before netserverinit()");
+    exit(-1);
+  }
+
+  // Get socket descriptor and connect to it
+  int sockfd = -1;
+  sockfd = socket(serveraddrinfo->ai_family, serveraddrinfo->ai_socktype, serveraddrinfo->ai_protocol);
+  int connectionStatus = connect(sockfd, serveraddrinfo->ai_addr, serveraddrinfo->ai_addrlen);
+  if (connectionStatus != 0) {
+    perror("connect");
+    return -1;
+  }
+
+  // Print that we've connected to the IP Address
+  char ipstring[INET_ADDRSTRLEN];
+  inet_ntop(serveraddrinfo->ai_family, (void *)((struct sockaddr *)serveraddrinfo->ai_addr), ipstring, sizeof ipstring);
+  printf("netwrite: Connected to %s\n", ipstring);
+
+  // wait for server to get ready to receive
+  sleep(1);
+  // Time to get serious: send the message type
+  printf("netwrite: Sending NETWRITE message...\n");
+  int msgtype = htonl(NETWRITE);
+  if (send(sockfd, &msgtype, sizeof(int), 0) == -1) {
+    perror("netwrite send messagetype");
+  }
+
+  // wait for server to get ready to receive
+  sleep(1);
+  // Send File Descriptor
+  printf("netwrite: Sending File Descriptor...\n");
+  int filedespayload = htonl(filedes);
+  if (send(sockfd, &filedespayload, sizeof(int), 0) == -1) {
+    perror("netwrite send filedespayload");
+  }
+
+  // wait for server to get ready to receive
+  sleep(1);
+  // Send size
+  printf("netwrite: Sending nbyte...%d\n", nbyte);
+  int sizepayload = htonl(nbyte);
+  if (send(sockfd, &sizepayload, sizeof(int), 0) == -1) {
+    perror("netwrite send sizepayload");
+  }
+
+  // wait for server to get ready to receive
+  sleep(1);
+  // Send string
+  printf("netwrite: Sending string...\n");
+  if (send(sockfd, buf, strlen(buf), 0) == -1) {
+    perror("netwrite send buf");
+  }
+
+  // Setup to receive result
+  printf("netwrite: Waiting to receive the result\n");
+  int resultsize;
+  int resultmsg;
+  if ((resultmsg = recv(sockfd, &resultsize, sizeof(resultsize), 0)) == -1) {
+    perror("netwrite recv result");
+  }
+  int result = ntohl(resultsize);
+  printf("netwrite: Received result size: %d!\n", result);
+
+  // check result and see if any errors
+  printf("netwrite: Checking for errors\n");
+  if (result == -1) {
+    int err;
+    // if there was an error, receive the errno
+    if ((resultmsg = recv(sockfd, &err, sizeof(err), 0)) == -1) {
+      perror("netwrite recv err");
+    }
+  }
+  return result;
+}
+
+int netclose(int fd){
+  if (!initCalled) {
+    fprintf(stderr, "netopen: %s\n", "netclose() called before netserverinit()");
+    exit(-1);
+  }
+
+  // Get socket descriptor and connect to it
+  int sockfd = -1;
+  sockfd = socket(serveraddrinfo->ai_family, serveraddrinfo->ai_socktype, serveraddrinfo->ai_protocol);
+  int connectionStatus = connect(sockfd, serveraddrinfo->ai_addr, serveraddrinfo->ai_addrlen);
+  if (connectionStatus != 0) {
+    perror("connect");
+    return -1;
+  }
+
+  // Print that we've connected to the IP Address
+  char ipstring[INET_ADDRSTRLEN];
+  inet_ntop(serveraddrinfo->ai_family, (void *)((struct sockaddr *)serveraddrinfo->ai_addr), ipstring, sizeof ipstring);
+  printf("netclose: Connected to %s\n", ipstring);
+
+  // wait for server to get ready to receive
+  sleep(1);
+  // Time to get serious: send the message type
+  printf("netclose: Sending NETCLOSE message...\n");
+  int msgtype = htonl(NETCLOSE);
+  if (send(sockfd, &msgtype, sizeof(int), 0) == -1) {
+    perror("netclose send messagetype");
+  }
+
+  // wait for server to get ready to receive
+  sleep(1);
+  // Send File Descriptor
+  printf("netclose: Sending File Descriptor...\n");
+  int filedespayload = htonl(fd);
+  if (send(sockfd, &filedespayload, sizeof(int), 0) == -1) {
+    perror("netclose send filedespayload");
+  }
+}
 
 // verifies that the host exists.
 // 'netserverinit' should return -1 on failure and 0 on success.
@@ -127,7 +319,16 @@ int netserverinit(char *hostname, int filemode) {
 
 // Debugging
 int main(int argc, char const *argv[]) {
-  netserverinit("cd.cs.rutgers.edu", 0.5);
-  netopen("/home/carlin/Documents/bs.txt", O_RDWR);
+  char res[MAXBUFFERSIZE];
+  char random[MAXBUFFERSIZE];
+  int bsfd = open("/home/carlin/Documents/bs.txt", O_RDWR);
+  int result = read(bsfd, random, 16);
+  write(bsfd, "lol", 3);
+  printf("%s\n", random);
+  netserverinit("localhost", 0.5);
+  int fd = netopen("/home/carlin/Documents/bs.txt", O_RDWR);
+  netread(fd, res, 4);
+  netwrite(fd, "lolol", 16);
+  netclose(fd);
   return 0;
 }
