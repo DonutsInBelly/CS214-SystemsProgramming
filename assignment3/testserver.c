@@ -16,8 +16,6 @@ void *msg_handler(void *vargp) {
   MsgData *first = (MsgData *)vargp;
   char buffer[MAXBUFFERSIZE];
 
-  pthread_detach(child);
-
   // NetOpen: 1
   // NetRead: 2
   // NetWrite: 3
@@ -137,6 +135,7 @@ int main(int argc, char const *argv[]) {
     // Threading stuff. Should create a worker thread to pass data to msg_handler.
     pthread_t child;
     pthread_create(&child, NULL, msg_handler, (void *)data);
+    pthread_detach(child);
   }
   return 0;
 }
